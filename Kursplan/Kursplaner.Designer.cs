@@ -83,15 +83,21 @@ partial class Kursplaner
             AllowUserToDeleteRows = true,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             ColumnHeadersVisible = true,
-            RowHeadersVisible = true,
-            ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize,
-            ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle { Font = new Font("Segoe UI", 9.75F, FontStyle.Bold) }
+            EnableHeadersVisualStyles = false,
+            ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+            {
+                BackColor = SystemColors.Control,
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                ForeColor = SystemColors.WindowText,
+                SelectionBackColor = SystemColors.Highlight,
+                SelectionForeColor = SystemColors.HighlightText
+            }
         };
         splitContainer.Panel2.Controls.Add(dgvData);
         
         // --- Bring toolbars to front ---
         splitContainer.BringToFront();
-        toolStrip.BringToFront();
+        //toolStrip.BringToFront();
         this.ResumeLayout(false);
     }
 
