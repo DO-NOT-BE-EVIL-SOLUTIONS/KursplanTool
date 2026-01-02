@@ -36,12 +36,6 @@ jobs:
         languages: ${{ matrix.language }}
         build-mode: manual
 
-    # Build steps adapted from CI.yml to ensure dependencies are present
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v5
-      with:
-        global-json-file: global.json
-
     - name: Set Paths
       id: set_paths
       shell: powershell
