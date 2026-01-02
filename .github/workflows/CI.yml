@@ -22,8 +22,12 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: Install Access Database Engine (ACE) x64
-        if: runner.os == 'Windows'
-        run: choco install accessdatabaseengine -y
+        shell: powershell
+        run: |
+          $url = "https://download.microsoft.com/download/3/5/c/35c84c36-661a-44e6-9324-8786b8dbe231/accessdatabaseengine_X64.exe"
+          $installer = "$env:TEMP\AccessDatabaseEngine.exe"
+          Invoke-WebRequest $url -OutFile $installer
+          Start-Process $installer -ArgumentList "/quiet /norestart" -Wait
 
       - name: Test
         run: dotnet test -c Release --no-build --verbosity normal
