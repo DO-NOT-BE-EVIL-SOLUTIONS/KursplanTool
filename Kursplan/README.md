@@ -2,6 +2,15 @@
 
 This small WinForms app opens a Microsoft Access database (`.accdb` or `.mdb`), displays the first user table in a `DataGridView`, lets the user edit rows, and saves changes back to the Access file.
 
+## Architecture Overview
+
+The main idea of this C# tool is to provide a user-friendly interface for a Microsoft Access file. The application is designed with a specific architecture in mind:
+
+- **Model-View-Service:** The application follows a service-oriented architecture.
+- **Data Model:** The expected layout of the Access database, including all required tables, is defined in the `Kursplan/Data` directory.
+- **Database Service:** A dedicated `DatabaseService` in `Kursplan/Services` handles all interactions with the Access file using OLE DB. This service is responsible for connecting, validating the schema, and performing data operations.
+- **UI:** The user interface, a WinForms application, is kept separate from the data logic and interacts exclusively through the `DatabaseService`.
+
 ## How it works
 
 - Download the newest release from the repository.

@@ -12,18 +12,33 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+      - name: Set Paths
+        id: set_paths
+        shell: powershell
+        run: |
+          $ace_path = Join-Path "${{ runner.temp }}" "AccessDatabaseEngine.exe"
+          echo "ace_path=$ace_path" >> $env:GITHUB_OUTPUT
+          echo "ACE_INSTALLER_PATH=$ace_path" >> $env:GITHUB_ENV
+
+      - name: Cache Access Database Engine installer
+        uses: actions/cache@v4
+        id: cache-ace-installer
         with:
-          global-json-file: global.json
+          path: ${{ steps.set_paths.outputs.ace_path }}
+          key: ${{ runner.os }}-ace-installer-x64
 
       - name: Install Access Database Engine (ACE) x64
         shell: powershell
         run: |
-          $url = "https://download.microsoft.com/download/3/5/c/35c84c36-661a-44e6-9324-8786b8dbe231/accessdatabaseengine_X64.exe"
-          $installer = "$env:TEMP\AccessDatabaseEngine.exe"
-          Invoke-WebRequest $url -OutFile $installer
-          Start-Process $installer -ArgumentList "/quiet /norestart" -Wait
+          if ('${{ steps.cache-ace-installer.outputs.cache-hit }}' -ne 'true') {
+            $url = "https://download.microsoft.com/download/3/5/c/35c84c36-661a-44e6-9324-8786b8dbe231/accessdatabaseengine_X64.exe"
+            Write-Host "Downloading ACE installer..."
+            Invoke-WebRequest $url -OutFile "$env:ACE_INSTALLER_PATH"
+          } else {
+            Write-Host "ACE installer restored from cache."
+          }
+          Write-Host "Installing ACE..."
+          Start-Process -FilePath "$env:ACE_INSTALLER_PATH" -ArgumentList "/quiet /norestart" -Wait
 
       - name: Restore
         run: dotnet restore
