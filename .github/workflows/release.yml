@@ -19,7 +19,6 @@ jobs:
     permissions:
       contents: write
     outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
       tag_name: ${{ steps.determine_tag.outputs.tag }}
     steps:
       - name: Checkout
@@ -40,7 +39,7 @@ jobs:
 
       - name: Create release entry
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -114,15 +113,15 @@ jobs:
         run: |
           $exe = Get-ChildItem -Path "publish/${{ matrix.rid }}" -Filter *.exe -File -Recurse | Select-Object -First 1 -ExpandProperty FullName
           if (-not $exe) { Write-Error "No exe found in publish/${{ matrix.rid }}"; exit 1 }
-          Write-Output "Found exe: $exe"
-          echo "exe_path=$exe" >> $env:GITHUB_OUTPUT
+          $newPath = Join-Path (Split-Path $exe) "Kursplan-${{ matrix.rid }}.exe"
+          Move-Item -Path $exe -Destination $newPath -Force
+          Write-Output "Artifact: $newPath"
+          echo "artifact_path=$newPath" >> $env:GITHUB_OUTPUT
 
       - name: Upload release artifact (${{ matrix.rid }})
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ${{ steps.find_exe.outputs.exe_path }}
-          asset_name: Kursplan-${{ matrix.rid }}.exe
-          asset_content_type: application/octet-stream
+          tag_name: ${{ needs.create-release.outputs.tag_name }}
+          files: ${{ steps.find_exe.outputs.artifact_path }}
