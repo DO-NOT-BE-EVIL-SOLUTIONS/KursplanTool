@@ -1,0 +1,62 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  schedule:
+    - cron: '30 1 * * 0'
+
+permissions:
+  contents: read
+  
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: windows-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: manual
+
+    # Build steps adapted from CI.yml to ensure dependencies are present
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
+    - name: Install Access Database Engine (ACE) x64
+      shell: powershell
+      run: |
+        $url = "https://download.microsoft.com/download/3/5/c/35c84c36-661a-44e6-9324-8786b8dbe231/accessdatabaseengine_X64.exe"
+        $installer = "$env:TEMP\AccessDatabaseEngine.exe"
+        Invoke-WebRequest $url -OutFile $installer
+        Start-Process $installer -ArgumentList "/quiet /norestart" -Wait
+
+    - name: Restore
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build -c Release --no-restore
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{ matrix.language }}"
