@@ -21,5 +21,9 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
 
+      - name: Install Access Database Engine (ACE) x64
+        if: runner.os == 'Windows'
+        run: choco install accessdatabaseengine -y
+
       - name: Test
         run: dotnet test -c Release --no-build --verbosity normal
