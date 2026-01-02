@@ -76,6 +76,7 @@ public class DatabaseService : IDisposable
         _adapter?.Dispose();
         _adapter = new OleDbDataAdapter($"SELECT * FROM [{tableName}]", _connection);
         
+        _adapter.MissingSchemaAction = MissingSchemaAction.AddWithKey;
         var dataTable = new DataTable();
         _adapter.Fill(dataTable);
         return dataTable;
@@ -91,6 +92,8 @@ public class DatabaseService : IDisposable
         try
         {
             using var builder = new OleDbCommandBuilder(_adapter);
+            builder.QuotePrefix = "[";
+            builder.QuoteSuffix = "]";
             _adapter.Update(dataTable);
             return (true, string.Empty);
         }
