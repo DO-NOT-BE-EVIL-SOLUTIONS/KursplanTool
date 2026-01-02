@@ -38,12 +38,12 @@ jobs:
           if ('${{ steps.cache-ace-installer.outputs.cache-hit }}' -ne 'true') {
             $url = "https://download.microsoft.com/download/3/5/c/35c84c36-661a-44e6-9324-8786b8dbe231/accessdatabaseengine_X64.exe"
             Write-Host "Downloading ACE installer..."
-            Invoke-WebRequest $url -OutFile "${{ env.ACE_INSTALLER_PATH }}"
+            Invoke-WebRequest $url -OutFile "$env:ACE_INSTALLER_PATH"
           } else {
             Write-Host "ACE installer restored from cache."
           }
           Write-Host "Installing ACE..."
-          Start-Process -FilePath "${{ env.ACE_INSTALLER_PATH }}" -ArgumentList "/quiet /norestart" -Wait
+          Start-Process -FilePath "$env:ACE_INSTALLER_PATH" -ArgumentList "/quiet /norestart" -Wait
 
       - name: Restore
         run: dotnet restore
