@@ -9,8 +9,6 @@ permissions:
 jobs:
   build-and-test:
     runs-on: windows-latest
-    env:
-      ACE_INSTALLER_PATH: ${{ runner.temp }}\AccessDatabaseEngine.exe
     steps:
       - uses: actions/checkout@v6
 
@@ -18,6 +16,10 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
+
+      - name: Set ACE installer path
+        shell: powershell
+        run: echo "ACE_INSTALLER_PATH=$(${{ runner.temp }})\AccessDatabaseEngine.exe" >> $GITHUB_ENV
 
       - name: Cache Access Database Engine installer
         uses: actions/cache@v4
