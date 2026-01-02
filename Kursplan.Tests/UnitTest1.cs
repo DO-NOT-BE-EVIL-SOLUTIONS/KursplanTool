@@ -33,7 +33,7 @@ public class UnitTest1
             }
         }
 
-        Assert.True(false, $"Failed to open Access file with known providers. Last error: {lastEx}");
+        Assert.Fail($"Failed to open Access file with known providers. Last error: {lastEx}");
     }
 
     private static string FindResourceFile(string folder, string fileName)
